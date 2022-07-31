@@ -1,5 +1,7 @@
 use nannou::prelude::*;
 
+mod mover;
+
 struct Model {}
 
 fn model(app: &App) -> Model {
