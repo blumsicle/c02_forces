@@ -8,7 +8,7 @@ mod mover;
 use mover::Mover;
 
 struct Model {
-    ball: Mover,
+    balls: Vec<Mover>,
     noise: Perlin,
 }
 
@@ -24,22 +24,30 @@ fn model(app: &App) -> Model {
     let seed = Utc::now().timestamp() as u32;
     let noise = Perlin::new().set_seed(seed);
 
-    Model {
-        ball: Mover::new(Vec2::ZERO, 10.0, hsv(0.0, 0.6, 0.6)),
-        noise,
+    let bounds = app.window_rect();
+    let mut balls = Vec::new();
+    for _ in 0..100 {
+        let position = (random::<Vec2>() - 0.5) * bounds.wh();
+        let mass = random_f32() * 20.0;
+        let color = hsv(random_f32(), 0.6, 0.6);
+        balls.push(Mover::new(position, mass, color));
     }
+
+    Model { balls, noise }
 }
 
 fn update(app: &App, model: &mut Model, _update: Update) {
     let bounds = app.window_rect();
-    let t = app.elapsed_frames() as f64 * 0.01;
+    let t = app.elapsed_frames();
 
-    let wind = model.noise.get([0.0, 0.0, t]) as f32 * 1.0;
-
-    model.ball.apply_force(vec2(wind, 0.0));
-    model.ball.apply_force(vec2(0.0, -1.0));
-    model.ball.update();
-    model.ball.check_edges(&bounds);
+    for (i, ball) in model.balls.iter_mut().enumerate() {
+        let t = (t + i as u64) as f64 * 0.01;
+        let wind = model.noise.get([0.0, 0.0, t]) as f32 * 1.0;
+        ball.apply_force(vec2(wind, 0.0));
+        ball.apply_force(vec2(0.0, -1.0));
+        ball.update();
+        ball.check_edges(&bounds);
+    }
 }
 
 fn view(app: &App, model: &Model, frame: Frame) {
@@ -47,7 +55,9 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
     draw.background().color(hsv(0.5, 0.4, 0.4));
 
-    model.ball.draw(&draw);
+    for ball in &model.balls {
+        ball.draw(&draw);
+    }
 
     draw.to_frame(app, &frame).unwrap();
 }
