@@ -25,7 +25,7 @@ fn model(app: &App) -> Model {
     let noise = Perlin::new().set_seed(seed);
 
     Model {
-        balloon: Mover::new(Vec2::ZERO, 24.0, hsv(0.0, 0.6, 0.6)),
+        balloon: Mover::new(Vec2::ZERO, 10.0, hsv(0.0, 0.6, 0.6)),
         noise,
     }
 }
@@ -34,9 +34,9 @@ fn update(app: &App, model: &mut Model, _update: Update) {
     let bounds = app.window_rect();
     let t = app.elapsed_frames() as f64 * 0.01;
 
-    let wind = model.noise.get([0.0, 0.0, t]) as f32 * 0.1;
+    let wind = model.noise.get([0.0, 0.0, t]) as f32 * 1.0;
 
-    model.balloon.apply_force(vec2(0.0, 0.01));
+    model.balloon.apply_force(vec2(0.0, 0.5));
     model.balloon.apply_force(vec2(wind, 0.0));
     model.balloon.update();
     model.balloon.check_edges(&bounds);

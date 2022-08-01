@@ -10,13 +10,13 @@ pub struct Mover {
 }
 
 impl Mover {
-    pub fn new(position: Vec2, radius: f32, color: Hsv) -> Self {
+    pub fn new(position: Vec2, mass: f32, color: Hsv) -> Self {
         Self {
             position,
             velocity: Vec2::ZERO,
             acceleration: Vec2::ZERO,
-            mass: 1.0,
-            radius,
+            mass,
+            radius: mass * 3.0,
             color,
         }
     }
@@ -39,10 +39,10 @@ impl Mover {
     }
 
     pub fn check_edges(&mut self, bounds: &Rect) {
-        if self.position.x < bounds.left() {
-            self.position.x = bounds.right();
-        } else if self.position.x > bounds.right() {
-            self.position.x = bounds.left();
+        if self.position.x + self.radius < bounds.left() {
+            self.position.x = bounds.right() + self.radius;
+        } else if self.position.x - self.radius > bounds.right() {
+            self.position.x = bounds.left() - self.radius;
         }
 
         if self.position.y + self.radius > bounds.top() {
