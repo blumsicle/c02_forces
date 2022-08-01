@@ -30,6 +30,8 @@ impl Mover {
     pub fn draw(&self, draw: &Draw) {
         draw.ellipse()
             .color(self.color)
+            .stroke(BLACK)
+            .stroke_weight(2.0)
             .radius(self.radius)
             .xy(self.position);
     }
@@ -45,9 +47,13 @@ impl Mover {
             self.position.x = bounds.left() - self.radius;
         }
 
+        if self.position.y - self.radius < bounds.bottom() {
+            self.position.y = bounds.bottom() + self.radius;
+            self.velocity.y *= -1.0;
+        }
         if self.position.y + self.radius > bounds.top() {
             self.position.y = bounds.top() - self.radius;
-            self.velocity.y *= -0.8;
+            self.velocity.y *= -1.0;
         }
     }
 }

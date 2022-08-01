@@ -8,7 +8,7 @@ mod mover;
 use mover::Mover;
 
 struct Model {
-    balloon: Mover,
+    ball: Mover,
     noise: Perlin,
 }
 
@@ -25,7 +25,7 @@ fn model(app: &App) -> Model {
     let noise = Perlin::new().set_seed(seed);
 
     Model {
-        balloon: Mover::new(Vec2::ZERO, 10.0, hsv(0.0, 0.6, 0.6)),
+        ball: Mover::new(Vec2::ZERO, 10.0, hsv(0.0, 0.6, 0.6)),
         noise,
     }
 }
@@ -36,10 +36,10 @@ fn update(app: &App, model: &mut Model, _update: Update) {
 
     let wind = model.noise.get([0.0, 0.0, t]) as f32 * 1.0;
 
-    model.balloon.apply_force(vec2(0.0, 0.5));
-    model.balloon.apply_force(vec2(wind, 0.0));
-    model.balloon.update();
-    model.balloon.check_edges(&bounds);
+    model.ball.apply_force(vec2(wind, 0.0));
+    model.ball.apply_force(vec2(0.0, -1.0));
+    model.ball.update();
+    model.ball.check_edges(&bounds);
 }
 
 fn view(app: &App, model: &Model, frame: Frame) {
@@ -47,7 +47,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
     draw.background().color(hsv(0.5, 0.4, 0.4));
 
-    model.balloon.draw(&draw);
+    model.ball.draw(&draw);
 
     draw.to_frame(app, &frame).unwrap();
 }
