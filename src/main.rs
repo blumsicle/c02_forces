@@ -28,7 +28,7 @@ fn model(app: &App) -> Model {
     let mut balls = Vec::new();
     for _ in 0..100 {
         let position = (random::<Vec2>() - 0.5) * bounds.wh();
-        let mass = random_f32() * 20.0;
+        let mass = 5.0 + random_f32() * 15.0;
         let color = hsv(random_f32(), 0.6, 0.6);
         balls.push(Mover::new(position, mass, color));
     }
@@ -44,7 +44,10 @@ fn update(app: &App, model: &mut Model, _update: Update) {
         let t = (t + i as u64) as f64 * 0.01;
         let wind = model.noise.get([0.0, 0.0, t]) as f32 * 1.0;
         ball.apply_force(vec2(wind, 0.0));
-        ball.apply_force(vec2(0.0, -1.0));
+
+        let gravity = -1.0 * ball.mass;
+        ball.apply_force(vec2(0.0, gravity));
+
         ball.update();
         ball.check_edges(&bounds);
     }
