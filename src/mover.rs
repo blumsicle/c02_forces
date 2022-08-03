@@ -50,8 +50,7 @@ impl Mover {
         if self.position.y - self.radius < bounds.bottom() {
             self.position.y = bounds.bottom() + self.radius;
             self.velocity.y *= -1.0;
-        }
-        if self.position.y + self.radius > bounds.top() {
+        } else if self.position.y + self.radius > bounds.top() {
             self.position.y = bounds.top() - self.radius;
             self.velocity.y *= -1.0;
         }
