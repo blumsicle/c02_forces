@@ -41,10 +41,12 @@ impl Mover {
     }
 
     pub fn check_edges(&mut self, bounds: &Rect) {
-        if self.position.x + self.radius < bounds.left() {
-            self.position.x = bounds.right() + self.radius;
-        } else if self.position.x - self.radius > bounds.right() {
-            self.position.x = bounds.left() - self.radius;
+        if self.position.x - self.radius < bounds.left() {
+            self.position.x = bounds.left() + self.radius;
+            self.velocity.x *= -1.0;
+        } else if self.position.x + self.radius > bounds.right() {
+            self.position.x = bounds.right() - self.radius;
+            self.velocity.x *= -1.0;
         }
 
         if self.position.y - self.radius < bounds.bottom() {
