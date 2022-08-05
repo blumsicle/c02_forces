@@ -7,8 +7,12 @@ use nannou::{
 mod mover;
 use mover::Mover;
 
+mod liquid;
+use liquid::Liquid;
+
 struct Model {
     balls: Vec<Mover>,
+    drag_field: Liquid,
     _noise: Perlin,
 }
 
@@ -27,14 +31,21 @@ fn model(app: &App) -> Model {
     let bounds = app.window_rect();
     let mut balls = Vec::new();
     for _ in 0..10 {
-        let position = (random::<Vec2>() - 0.5) * bounds.wh();
+        let position = vec2((random_f32() - 0.5) * bounds.w(), bounds.top() - 30.0);
         // let position = vec2((random_f32() - 0.5) * bounds.w(), 200.0);
         let mass = 5.0 + random_f32() * 15.0;
         let color = hsv(random_f32(), 0.6, 0.2);
         balls.push(Mover::new(position, mass, color));
     }
 
-    Model { balls, _noise }
+    let rect = Rect::from_w_h(bounds.w(), bounds.h() * 0.5).align_bottom_of(bounds);
+    let drag_field = Liquid::new(rect.xy(), rect.wh(), 0.2);
+
+    Model {
+        balls,
+        drag_field,
+        _noise,
+    }
 }
 
 fn update(app: &App, model: &mut Model, _update: Update) {
@@ -45,11 +56,14 @@ fn update(app: &App, model: &mut Model, _update: Update) {
         let wind = vec2(0.1, 0.0);
         ball.apply_force(wind);
 
-        // Friction force
-        let c = 0.1;
-        let friction = (ball.velocity * -1.0).normalize_or_zero();
-        let friction = friction * c;
-        ball.apply_force(friction);
+        // Drag force
+        if ball.is_inside(&model.drag_field) {
+            let speed = ball.velocity.length();
+            let drag_magnitude = model.drag_field.coefficient * speed * speed;
+            let drag = (ball.velocity * -1.0).normalize_or_zero();
+            let drag = drag * drag_magnitude;
+            ball.apply_force(drag);
+        }
 
         // Gravity force
         let gravity = vec2(0.0, -1.0 * ball.mass);
@@ -68,6 +82,8 @@ fn view(app: &App, model: &Model, frame: Frame) {
     for ball in &model.balls {
         ball.draw(&draw);
     }
+
+    model.drag_field.draw(&draw);
 
     draw.to_frame(app, &frame).unwrap();
 }

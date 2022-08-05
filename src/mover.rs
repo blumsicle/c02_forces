@@ -1,5 +1,7 @@
 use nannou::prelude::*;
 
+use crate::liquid::Liquid;
+
 pub struct Mover {
     pub position: Vec2,
     pub velocity: Vec2,
@@ -38,6 +40,13 @@ impl Mover {
 
     pub fn apply_force(&mut self, force: Vec2) {
         self.acceleration += force / self.mass;
+    }
+
+    pub fn is_inside(&self, liquid: &Liquid) -> bool {
+        self.position.x > liquid.rect.left()
+            && self.position.x < liquid.rect.right()
+            && self.position.y > liquid.rect.bottom()
+            && self.position.y < liquid.rect.top()
     }
 
     pub fn check_edges(&mut self, bounds: &Rect) {
