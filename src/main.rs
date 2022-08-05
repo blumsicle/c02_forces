@@ -1,6 +1,6 @@
 use chrono::Utc;
 use nannou::{
-    noise::{NoiseFn, Perlin, Seedable},
+    noise::{Perlin, Seedable},
     prelude::*,
 };
 
@@ -9,7 +9,7 @@ use mover::Mover;
 
 struct Model {
     balls: Vec<Mover>,
-    noise: Perlin,
+    _noise: Perlin,
 }
 
 fn model(app: &App) -> Model {
@@ -22,7 +22,7 @@ fn model(app: &App) -> Model {
         .unwrap();
 
     let seed = Utc::now().timestamp() as u32;
-    let noise = Perlin::new().set_seed(seed);
+    let _noise = Perlin::new().set_seed(seed);
 
     let bounds = app.window_rect();
     let mut balls = Vec::new();
@@ -34,18 +34,24 @@ fn model(app: &App) -> Model {
         balls.push(Mover::new(position, mass, color));
     }
 
-    Model { balls, noise }
+    Model { balls, _noise }
 }
 
 fn update(app: &App, model: &mut Model, _update: Update) {
     let bounds = app.window_rect();
-    let t = app.elapsed_frames();
 
-    for (i, ball) in model.balls.iter_mut().enumerate() {
-        let t = (t + (i * 10) as u64) as f64 * 0.01;
-        let wind = model.noise.get([0.0, 0.0, t]) as f32 * 2.0;
-        ball.apply_force(vec2(wind, 0.0));
+    for ball in &mut model.balls {
+        // Wind force
+        let wind = vec2(0.1, 0.0);
+        ball.apply_force(wind);
 
+        // Friction force
+        let c = 0.1;
+        let friction = (ball.velocity * -1.0).normalize_or_zero();
+        let friction = friction * c;
+        ball.apply_force(friction);
+
+        // Gravity force
         let gravity = -1.0 * ball.mass;
         ball.apply_force(vec2(0.0, gravity));
 
