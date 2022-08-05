@@ -52,8 +52,8 @@ fn update(app: &App, model: &mut Model, _update: Update) {
         ball.apply_force(friction);
 
         // Gravity force
-        let gravity = -1.0 * ball.mass;
-        ball.apply_force(vec2(0.0, gravity));
+        let gravity = vec2(0.0, -1.0 * ball.mass);
+        ball.apply_force(gravity);
 
         ball.update();
         ball.check_edges(&bounds);
