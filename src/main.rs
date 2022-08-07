@@ -32,7 +32,6 @@ fn model(app: &App) -> Model {
     let mut balls = Vec::new();
     for _ in 0..10 {
         let position = vec2((random_f32() - 0.5) * bounds.w(), bounds.top() - 30.0);
-        // let position = vec2((random_f32() - 0.5) * bounds.w(), 200.0);
         let mass = 5.0 + random_f32() * 15.0;
         let color = hsv(random_f32(), 0.6, 0.2);
         balls.push(Mover::new(position, mass, color));
